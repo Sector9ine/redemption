@@ -34,28 +34,6 @@ OPENAI_API_KEY=your_openai_api_key_here
 python discord_bot.py
 ```
 
-## GitHub & Railway Deployment
-
-### 1. Push to GitHub
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/yourusername/rs-bot.git
-git push -u origin main
-```
-
-### 2. Deploy to Railway
-1. Go to [Railway](https://railway.app/)
-2. Click "New Project"
-3. Select "Deploy from GitHub repo"
-4. Choose your repository
-5. Add environment variables in Railway dashboard:
-   - `DISCORD_TOKEN` = your Discord bot token
-   - `OPENAI_API_KEY` = your OpenAI API key
-6. Deploy!
-
 ## Usage
 
 ### In Discord Servers:
@@ -71,35 +49,10 @@ git push -u origin main
 - "How do I start playing Redemption RSPS?"
 - "What gear should I use for boss fights?"
 
-## Environment Variables
-
-### Required for Railway:
-- `DISCORD_TOKEN` - Your Discord bot token
-- `OPENAI_API_KEY` - Your OpenAI API key
-
-### Local Development:
-Create a `.env` file with the same variables.
-
 ## Files Explained
 
 - `wiki_scraper.py` - Scrapes all wiki content
 - `discord_bot.py` - Main Discord bot with OpenAI integration
 - `requirements.txt` - Python dependencies
 - `Procfile` - Railway deployment configuration
-- `.gitignore` - Excludes sensitive files from Git
 - `README.md` - This file
-
-## Security Notes
-
-- ✅ Tokens are stored as environment variables
-- ✅ `.env` file is excluded from Git
-- ✅ No hardcoded secrets in the code
-- ✅ Safe for public GitHub repositories
-
-## Support
-
-If you run into issues:
-1. Check that environment variables are set correctly
-2. Verify your Discord bot has proper permissions
-3. Ensure your OpenAI API key is valid
-4. Check Railway logs for deployment issues
