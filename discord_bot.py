@@ -119,7 +119,7 @@ Wiki Context:
             
             # Call OpenAI API
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o",
                 messages=[
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user_message}
