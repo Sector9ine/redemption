@@ -3,8 +3,12 @@ from discord.ext import commands
 import json
 import asyncio
 import os
+import schedule
+import time
+import threading
 from typing import Optional
 from openai import OpenAI
+from wiki_scraper import AsyncWikiScraper
 
 class WikiBot:
     def __init__(self, token: str, openai_api_key: str):
@@ -21,6 +25,9 @@ class WikiBot:
         # Load wiki data for context
         self.load_wiki_data()
         
+        # Setup scheduled scraping
+        self.setup_scheduled_scraping()
+        
         # Setup bot commands
         self.setup_commands()
     
@@ -34,6 +41,38 @@ class WikiBot:
             print(f"Loaded {len(self.wiki_data)} wiki pages")
         except FileNotFoundError:
             print("Warning: wiki_training_data.json not found. Run wiki_scraper.py first.")
+    
+    def setup_scheduled_scraping(self):
+        """Setup daily wiki scraping at 2 AM"""
+        schedule.every().day.at("02:00").do(self.daily_scrape)
+        
+        # Start the scheduler in a separate thread
+        def run_scheduler():
+            while True:
+                schedule.run_pending()
+                time.sleep(60)  # Check every minute
+        
+        scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+        scheduler_thread.start()
+        print("Scheduled daily wiki scraping at 2:00 AM")
+    
+    def daily_scrape(self):
+        """Run daily wiki scraping"""
+        print("Starting daily wiki scrape...")
+        try:
+            # Run the scraper
+            asyncio.run(self.run_scraper())
+            # Reload the data
+            self.load_wiki_data()
+            print("Daily wiki scrape completed successfully!")
+        except Exception as e:
+            print(f"Error during daily scrape: {e}")
+    
+    async def run_scraper(self):
+        """Run the wiki scraper"""
+        async with AsyncWikiScraper() as scraper:
+            training_data = await scraper.scrape_all_content()
+            scraper.save_training_data(training_data)
     
     def find_relevant_context(self, question: str) -> str:
         """Find relevant wiki content for the question"""
