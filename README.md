@@ -4,7 +4,7 @@ This project creates a Discord bot that uses OpenAI API to answer questions abou
 
 ## What This Does
 
-1. **Scrapes MedaWiki data** from redemptionps.com/wiki
+1. **Scrapes MediaWiki data** from redemptionps.com/wiki
 2. **Uses OpenAI API** to answer questions intelligently
 3. **Discord bot interface** for customers to ask questions
 4. **Responds to mentions** and DMs with relevant wiki information

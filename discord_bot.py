@@ -8,7 +8,7 @@ import time
 import threading
 from typing import Optional
 from openai import OpenAI
-from wiki_scraper import AsyncWikiScraper
+from sql_wiki_parser import SQLWikiParser
 
 class WikiBot:
     def __init__(self, token: str, openai_api_key: str):
@@ -40,11 +40,11 @@ class WikiBot:
                     self.wiki_data[page['title'].lower()] = page['content']
             print(f"Loaded {len(self.wiki_data)} wiki pages")
         except FileNotFoundError:
-            print("Warning: wiki_training_data.json not found. Run wiki_scraper.py first.")
+            print("Warning: wiki_training_data.json not found. Run sql_wiki_parser.py first.")
     
     def setup_scheduled_scraping(self):
-        """Setup daily wiki scraping at 2 AM"""
-        schedule.every().day.at("02:00").do(self.daily_scrape)
+        """Setup daily wiki parsing at 2 AM"""
+        schedule.every().day.at("02:00").do(self.daily_parse)
         
         # Start the scheduler in a separate thread
         def run_scheduler():
@@ -54,25 +54,21 @@ class WikiBot:
         
         scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
         scheduler_thread.start()
-        print("Scheduled daily wiki scraping at 2:00 AM")
+        print("Scheduled daily wiki parsing at 2:00 AM")
     
-    def daily_scrape(self):
-        """Run daily wiki scraping"""
-        print("Starting daily wiki scrape...")
+    def daily_parse(self):
+        """Run daily wiki parsing from SQL dump"""
+        print("Starting daily wiki parse from SQL...")
         try:
-            # Run the scraper
-            asyncio.run(self.run_scraper())
+            # Run the SQL parser
+            parser = SQLWikiParser()
+            wiki_data = parser.parse_sql_dump()
+            parser.save_to_json(wiki_data)
             # Reload the data
             self.load_wiki_data()
-            print("Daily wiki scrape completed successfully!")
+            print("Daily wiki parse completed successfully!")
         except Exception as e:
-            print(f"Error during daily scrape: {e}")
-    
-    async def run_scraper(self):
-        """Run the wiki scraper"""
-        async with AsyncWikiScraper() as scraper:
-            training_data = await scraper.scrape_all_content()
-            scraper.save_training_data(training_data)
+            print(f"Error during daily parse: {e}")
     
     def find_relevant_context(self, question: str) -> str:
         """Find relevant wiki content for the question"""
